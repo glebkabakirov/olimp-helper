@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Олимп-хелпер</string>
+    <string name="widget_name">Олимпиады</string>
+    <string name="widget_description">Ближайшие регистрации и этапы. Что показывать, выбирается в настройке виджета.</string>
 </resources>

@@ -84,12 +84,20 @@ fun SettingsScreen(u: UiState, vm: MainViewModel, onBack: () -> Unit) {
             }
             OutlinedButton(onClick = { vm.testNotification() }) { Text("Проверить уведомление") }
 
+            SectionHeader("Виджет")
+            Text(
+                "Долго нажми на пустое место рабочего стола → «Виджеты» → «Олимп-хелпер». При добавлении выберешь, " +
+                    "что показывать: всё ближайшее, только регистрации, только этапы или открытые регистрации, " +
+                    "на сколько дней и по каким олимпиадам. Поменять потом: долгое нажатие на виджет → «Настроить».",
+                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+
             SectionHeader("Источники")
             UrlField("Google-таблица", s.sheetUrl, reset = DEFAULT_SHEET_URL) { v -> set { it.copy(sheetUrl = v) } }
             UrlField("Файл находок Claude (updates.json)", s.updatesUrl, reset = null) { v -> set { it.copy(updatesUrl = v) } }
             Text("Таблица обновлена: ${stamp(u.state.tableFetchedAt)}", style = MaterialTheme.typography.bodySmall)
             Button(onClick = { vm.refresh() }) { Text("Обновить сейчас") }
-            Text("Олимп-хелпер 1.0", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+            Text("Олимп-хелпер 1.1",style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(vertical = 16.dp))
         }
     }

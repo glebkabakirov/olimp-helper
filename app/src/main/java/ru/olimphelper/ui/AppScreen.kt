@@ -30,6 +30,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableIntState
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,7 +52,7 @@ private val TABS = listOf(
 )
 
 @Composable
-fun AppScreen(vm: MainViewModel, tabState: MutableIntState) {
+fun AppScreen(vm: MainViewModel, tabState: MutableIntState, openRequest: MutableState<String?>) {
     val ui by vm.ui.collectAsStateWithLifecycle()
     val syncing by vm.syncing.collectAsStateWithLifecycle()
     val message by vm.message.collectAsStateWithLifecycle()
@@ -64,6 +65,13 @@ fun AppScreen(vm: MainViewModel, tabState: MutableIntState) {
         message?.let {
             vm.message.value = null
             snackbar.showSnackbar(it)
+        }
+    }
+    LaunchedEffect(openRequest.value) {
+        openRequest.value?.let {
+            settingsOpen = false
+            olympiad = it
+            openRequest.value = null
         }
     }
     LaunchedEffect(tab, ui?.state?.unseenChanges) {

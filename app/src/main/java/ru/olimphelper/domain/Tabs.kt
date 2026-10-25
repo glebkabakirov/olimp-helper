@@ -40,26 +40,40 @@ object Tabs {
         val visible = model.events.filter { !hidden(it, registered) && it.date >= today }
         val (soonEv, laterEv) = visible.partition { inSoon(it, today, horizonDays) }
 
-        val conditional = { st: Stage -> st.isFinal && st.prevKey != null && st.prevKey !in passed }
         val realStages = model.stages.filter { !it.isRegRow }
+        return TabsData(
+            // те, у кого срок в пределах горизонта, и так видны в ленте событий
+            openRegs = openRegistrations(model, registered, passed, today).filter { it.deadline == null || it.deadline > horizon },
+            ongoing = ongoing(model, passed, today),
+            soon = soonEv.groupBy { it.date }.toSortedMap().map { (d, ev) -> DayGroup(d, ev) },
+            later = laterEv.groupBy { YearMonth.from(it.date) }.toSortedMap().map { (m, ev) -> MonthGroup(m, ev) },
+            undated = realStages.filter { it.dates.spans.isEmpty() },
+        )
+    }
 
-        val openRegs = realStages
+    private fun waitsForPass(st: Stage, passed: Set<String>) = st.isFinal && st.prevKey != null && st.prevKey !in passed
+
+    /** Все регистрации, открытые сегодня, где ещё нет отметки «Зарегистрировался», по сроку. */
+    fun openRegistrations(model: Model, registered: Set<String>, passed: Set<String>, today: LocalDate): List<OpenReg> =
+        model.stages
             .filter { st ->
                 val reg = st.reg ?: return@filter false
-                st.key !in registered && !conditional(st) && Registration.isOpen(reg.status, reg.window, today) &&
+                !st.isRegRow && st.key !in registered && !waitsForPass(st, passed) &&
+                    Registration.isOpen(reg.status, reg.window, today) &&
                     st.dates.spans.let { sp -> sp.isEmpty() || sp.any { it.end >= today } }
             }
             .map { st ->
                 val w = st.reg!!.window?.takeIf { !it.openEnd }
                 OpenReg(listOf(st), w?.end, w?.endTime, st.dates.spans.maxOfOrNull { it.end }, st.reg.url ?: st.row.sourceUrl)
             }
-            .filter { it.deadline == null || it.deadline > horizon }
             .groupBy { listOf(norm(it.stages[0].row.olympiad), it.deadline) }
             .values.map { g -> g[0].copy(stages = g.flatMap { it.stages }) }
             .sortedWith(compareBy(nullsLast()) { it.deadline })
 
-        val ongoing = realStages
-            .filter { !conditional(it) }
+    /** Этапы, которые уже начались и ещё не закончились. */
+    fun ongoing(model: Model, passed: Set<String>, today: LocalDate): List<Ongoing> =
+        model.stages
+            .filter { !it.isRegRow && !waitsForPass(it, passed) }
             .mapNotNull { st ->
                 st.dates.spans.firstOrNull { s ->
                     val start = s.start
@@ -67,13 +81,4 @@ object Tabs {
                 }?.let { Ongoing(st, it.end, it.endTime) }
             }
             .sortedBy { it.until }
-
-        return TabsData(
-            openRegs = openRegs,
-            ongoing = ongoing,
-            soon = soonEv.groupBy { it.date }.toSortedMap().map { (d, ev) -> DayGroup(d, ev) },
-            later = laterEv.groupBy { YearMonth.from(it.date) }.toSortedMap().map { (m, ev) -> MonthGroup(m, ev) },
-            undated = realStages.filter { it.dates.spans.isEmpty() },
-        )
-    }
 }

@@ -12,6 +12,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import ru.olimphelper.data.Repository
+import ru.olimphelper.widget.OlimpWidget
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
@@ -27,6 +28,8 @@ class SyncWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ctx, 
         Notifier.changes(ctx, result, s.notifyTableChanges, s.notifyClaude)
         val now = LocalDateTime.now()
         if (now.hour >= 9) Notifier.remind(ctx, repo, now.toLocalDate())
+        // «через 3 дня» на виджете должно стать «через 2 дня», даже если данные не менялись
+        runCatching { OlimpWidget.refresh(ctx) }
         if (inputData.getBoolean(KEY_MORNING, false)) Scheduler.scheduleMorning(ctx, ExistingWorkPolicy.APPEND_OR_REPLACE)
         return Result.success()
     }

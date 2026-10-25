@@ -107,4 +107,22 @@ data class AppState(
     val seenUpdates: Set<String> = emptySet(),
     /** id напоминания → день события (epochDay), чтобы не слать одно и то же дважды. */
     val notified: Map<String, Long> = emptyMap(),
+    /** Настройки виджетов на рабочем столе по appWidgetId. */
+    val widgets: Map<Int, WidgetConfig> = emptyMap(),
+)
+
+@Serializable
+enum class WidgetContent(val title: String, val description: String) {
+    ALL("Скоро", "регистрации и этапы на ближайшие дни"),
+    REGISTRATIONS("Регистрации", "открытие и конец регистраций, плюс открытые сейчас"),
+    STAGES("Этапы", "начало и конец этапов, плюс идущие сейчас"),
+    OPEN_REGS("Открытые регистрации", "куда можно зарегистрироваться прямо сейчас"),
+}
+
+@Serializable
+data class WidgetConfig(
+    val content: WidgetContent = WidgetContent.ALL,
+    val days: Int = 14,
+    /** Нормализованные названия олимпиад; пусто — все. */
+    val olympiads: Set<String> = emptySet(),
 )
