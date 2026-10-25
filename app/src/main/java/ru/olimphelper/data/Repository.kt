@@ -29,7 +29,9 @@ class Repository private constructor(private val ctx: Context) {
     )
 
     private fun load(): AppState {
-        val saved = runCatching { JSON.decodeFromString<AppState>(file.readText()) }.getOrNull() ?: AppState()
+        var saved = runCatching { JSON.decodeFromString<AppState>(file.readText()) }.getOrNull() ?: AppState()
+        // В ранних сборках адрес находок был заглушкой: подставляем настоящий.
+        if ("/OWNER/" in saved.settings.updatesUrl) saved = saved.copy(settings = saved.settings.copy(updatesUrl = DEFAULT_UPDATES_URL))
         if (saved.table != null) return saved
         // Первый запуск: снимок таблицы, вшитый в приложение, чтобы было что показать без интернета.
         val bundled = runCatching { SheetSource.parse(ctx.assets.open("table.xlsx").use { it.readBytes() }) }.getOrNull()

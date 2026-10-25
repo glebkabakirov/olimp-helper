@@ -119,12 +119,11 @@ private fun StageCard(st: Stage, o: Olympiad, u: UiState, actions: Actions) {
             if (st.row.note.isNotBlank()) Text(st.row.note, style = MaterialTheme.typography.bodySmall, color = muted)
 
             for (up in st.updates) {
-                Surface(color = MaterialTheme.colorScheme.primaryContainer, shape = RoundedCornerShape(10.dp)) {
+                Surface(color = MaterialTheme.colorScheme.surfaceContainerHighest, shape = RoundedCornerShape(10.dp)) {
                     Column(Modifier.padding(10.dp)) {
                         Text(
                             "🤖 Claude, ${up.checkedAt ?: "недавно"}: ${up.summary}",
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
                         )
                         LinkButton("Где написано", up.sourceUrl)
                     }
