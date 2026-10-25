@@ -1,4 +1,39 @@
 {
-  "generatedAt": null,
-  "items": []
+  "generatedAt": "2026-10-25T15:30:00+03:00",
+  "items": [
+    {
+      "id": "technocup-qual-dates",
+      "olympiad": "Технокубок",
+      "stage": "Регистрация / отборочный",
+      "kind": "update",
+      "date": "22.10.2026 – 06.12.2026",
+      "registration": "ОТКРЫТА",
+      "registrationDates": "22.10.2026 – 06.12.2026",
+      "summary": "На сайте: регистрация и ознакомительный раунд 22.10–06.12, отборочные 08.11 и 06.12 онлайн, третий отборочный 30.01.2027 очно",
+      "sourceUrl": "https://techno-cup.ru/",
+      "checkedAt": "2026-10-25"
+    },
+    {
+      "id": "technocup-final-date",
+      "olympiad": "Технокубок",
+      "stage": "Заключительный",
+      "kind": "update",
+      "date": "12.03.2027 – 14.03.2027",
+      "summary": "На сайте объявлен очный финал 12–14 марта (Долгопрудный и Москва)",
+      "sourceUrl": "https://techno-cup.ru/",
+      "checkedAt": "2026-10-25"
+    },
+    {
+      "id": "innopolis-open-reg-qual2",
+      "olympiad": "Innopolis Open",
+      "stage": "Регистрация на II отборочный",
+      "kind": "new_stage",
+      "date": "19.10.2026 – 18.11.2026",
+      "registration": "ОТКРЫТА",
+      "registrationDates": "19.10.2026, 10:00 МСК – 18.11.2026, 12:00 МСК",
+      "summary": "На сайте указано окно регистрации на II отборочный тур (21.11 пробный, 22.11 основной)",
+      "sourceUrl": "https://dovuz.innopolis.university/innopolis-open/informatics",
+      "checkedAt": "2026-10-25"
+    }
+  ]
 }
