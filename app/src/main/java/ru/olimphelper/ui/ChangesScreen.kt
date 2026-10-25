@@ -44,7 +44,7 @@ fun ChangesScreen(u: UiState, actions: Actions) {
                         when {
                             notConfigured -> "Проверка сайтов Claude ещё не подключена"
                             s.updates.generatedAt != null -> "Claude проверял сайты: ${s.updates.generatedAt!!.take(16).replace('T', ' ')}"
-                            s.updatesFetchedAt > 0 -> "Claude ещё не проверял сайты"
+                            s.updatesFetchedAt > 0 -> "Claude ещё не проверял сайты (проверка раз в 3 дня)"
                             else -> "Находки Claude ещё не загружались"
                         },
                         style = MaterialTheme.typography.bodyMedium,

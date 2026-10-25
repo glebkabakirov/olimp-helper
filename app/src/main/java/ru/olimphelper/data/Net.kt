@@ -6,6 +6,8 @@ import java.net.URL
 
 object Net {
 
+    class HttpError(val code: Int) : IOException("HTTP $code")
+
     /** GET с ручной обработкой редиректов: Google отдаёт выгрузку таблицы через 307 на другой хост. */
     fun get(url: String): ByteArray {
         var current = URL(url)
@@ -22,7 +24,7 @@ object Net {
                     current = URL(current, c.getHeaderField("Location") ?: throw IOException("HTTP $code без адреса"))
                     return@repeat
                 }
-                if (code != 200) throw IOException("HTTP $code")
+                if (code != 200) throw HttpError(code)
                 return c.inputStream.use { it.readBytes() }
             } finally {
                 c.disconnect()

@@ -87,8 +87,9 @@ data class Settings(
 
 const val DEFAULT_SHEET_URL =
     "https://docs.google.com/spreadsheets/d/16wKSRx8b7BC8YQeT9ulPl3gHKJ7hHWq0/edit?gid=749938116"
+/** Облачный Claude может пушить только в ветки claude/…, поэтому находки лежат в claude/updates. */
 const val DEFAULT_UPDATES_URL =
-    "https://raw.githubusercontent.com/glebkabakirov/olimp-helper/main/data/updates.json"
+    "https://raw.githubusercontent.com/glebkabakirov/olimp-helper/refs/heads/claude/updates/data/updates.json"
 
 @Serializable
 data class AppState(

@@ -30,8 +30,11 @@ class Repository private constructor(private val ctx: Context) {
 
     private fun load(): AppState {
         var saved = runCatching { JSON.decodeFromString<AppState>(file.readText()) }.getOrNull() ?: AppState()
-        // В ранних сборках адрес находок был заглушкой: подставляем настоящий.
-        if ("/OWNER/" in saved.settings.updatesUrl) saved = saved.copy(settings = saved.settings.copy(updatesUrl = DEFAULT_UPDATES_URL))
+        // В ранних сборках адрес находок был другим: подставляем нынешний.
+        val oldUrls = listOf("/OWNER/", "/olimp-helper/main/data/updates.json")
+        if (oldUrls.any { it in saved.settings.updatesUrl }) {
+            saved = saved.copy(settings = saved.settings.copy(updatesUrl = DEFAULT_UPDATES_URL))
+        }
         if (saved.table != null) return saved
         // Первый запуск: снимок таблицы, вшитый в приложение, чтобы было что показать без интернета.
         val bundled = runCatching { SheetSource.parse(ctx.assets.open("table.xlsx").use { it.readBytes() }) }.getOrNull()
@@ -57,7 +60,14 @@ class Repository private constructor(private val ctx: Context) {
         val now = System.currentTimeMillis()
         val table = runCatching { SheetSource.parse(Net.get(SheetSource.exportUrl(settings.sheetUrl))) }
         val updates = if (settings.updatesUrl.isBlank() || "/OWNER/" in settings.updatesUrl) null
-        else runCatching { JSON.decodeFromString(UpdatesFile.serializer(), Net.get(settings.updatesUrl).decodeToString()) }
+        else runCatching {
+            try {
+                JSON.decodeFromString(UpdatesFile.serializer(), Net.get(settings.updatesUrl).decodeToString())
+            } catch (e: Net.HttpError) {
+                // Claude ещё ни разу не проверял сайты, файла пока нет
+                if (e.code == 404) UpdatesFile() else throw e
+            }
+        }
 
         var changes = emptyList<ChangeEntry>()
         var fresh = emptyList<UpdateItem>()

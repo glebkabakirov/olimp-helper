@@ -3,7 +3,9 @@
 Android-приложение, которое следит за датами олимпиад по информатике: регистрации, отборочные и
 заключительные этапы. Данные берутся из
 [Google-таблицы](https://docs.google.com/spreadsheets/d/16wKSRx8b7BC8YQeT9ulPl3gHKJ7hHWq0/edit?gid=749938116),
-а раз в 3 дня Claude проверяет сайты олимпиад и кладёт найденное в [`data/updates.json`](data/updates.json).
+а раз в 3 дня Claude проверяет сайты олимпиад и кладёт найденное в `data/updates.json` в ветке
+[`claude/updates`](https://github.com/glebkabakirov/olimp-helper/blob/claude/updates/data/updates.json)
+(облачный Claude может пушить только в ветки `claude/…`; в `main` этот файл остаётся пустым).
 
 ## Что умеет
 
@@ -35,9 +37,10 @@ Android-приложение, которое следит за датами ол
 ```
 Google-таблица (xlsx) ──┐
                         ├─► приложение: разбор дат → события → вкладки и напоминания
-data/updates.json ──────┘
+updates.json ───────────┘
+(ветка claude/updates)
         ▲
-        └── Claude routine раз в 3 дня: сайты олимпиад → отличия от таблицы → коммит
+        └── Claude routine раз в 3 дня: сайты олимпиад → отличия от таблицы → force-push
 ```
 
 - `app/src/main/java/ru/olimphelper/domain/` — разбор дат (`DateParser`), окна регистрации из примечаний
