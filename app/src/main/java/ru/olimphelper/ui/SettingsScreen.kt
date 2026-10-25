@@ -97,7 +97,8 @@ fun SettingsScreen(u: UiState, vm: MainViewModel, onBack: () -> Unit) {
             UrlField("Файл находок Claude (updates.json)", s.updatesUrl, reset = null) { v -> set { it.copy(updatesUrl = v) } }
             Text("Таблица обновлена: ${stamp(u.state.tableFetchedAt)}", style = MaterialTheme.typography.bodySmall)
             Button(onClick = { vm.refresh() }) { Text("Обновить сейчас") }
-            Text("Олимп-хелпер 1.1",style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+            val version = remember { runCatching { ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionName }.getOrNull() }
+            Text("Олимп-хелпер ${version.orEmpty()}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(vertical = 16.dp))
         }
     }
