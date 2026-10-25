@@ -76,6 +76,7 @@ fun SettingsScreen(u: UiState, vm: MainViewModel, onBack: () -> Unit) {
             SwitchRow("За 3 дня", s.remind3) { v -> set { it.copy(remind3 = v) } }
             SwitchRow("За день", s.remind1) { v -> set { it.copy(remind1 = v) } }
             SwitchRow("В день события", s.remind0) { v -> set { it.copy(remind0 = v) } }
+            SwitchRow("Раз в неделю: где не отметился", s.weeklyDigest) { v -> set { it.copy(weeklyDigest = v) } }
             SwitchRow("Изменения в таблице", s.notifyTableChanges) { v -> set { it.copy(notifyTableChanges = v) } }
             SwitchRow("Находки Claude на сайтах", s.notifyClaude) { v -> set { it.copy(notifyClaude = v) } }
             if (!Notifier.canPost(ctx)) {

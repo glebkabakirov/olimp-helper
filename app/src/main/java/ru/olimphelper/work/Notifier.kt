@@ -66,10 +66,22 @@ object Notifier {
         val model = st.model(today) ?: return
         val due = Reminders.due(model, st.registered, st.settings, today, st.notified)
         for (d in due) post(ctx, d.id.hashCode(), CH_REMIND, Reminders.title(d), Reminders.text(d), tab = 0)
-        if (due.isEmpty() && st.notified.values.none { it < today.toEpochDay() - 30 }) return
+
+        // раз в неделю: то, что по датам не напоминается
+        val digestDue = st.settings.weeklyDigest && today.toEpochDay() - st.lastDigestDay >= 7
+        val digest = if (digestDue) Reminders.digest(model, st.registered, st.passed, today) else emptyList()
+        if (digest.isNotEmpty()) {
+            post(ctx, 1003, CH_REMIND, "Не забудь отметить: ${digest.size}",
+                digest.take(6).joinToString("\n") + if (digest.size > 6) "\n…" else "", tab = 0)
+        }
+
+        if (due.isEmpty() && digest.isEmpty() && st.notified.values.none { it < today.toEpochDay() - 30 }) return
         repo.update { s ->
             val keep = s.notified.filterValues { it >= today.toEpochDay() - 30 }
-            s.copy(notified = keep + due.associate { it.id to it.event.date.toEpochDay() })
+            s.copy(
+                notified = keep + due.associate { it.id to it.event.date.toEpochDay() },
+                lastDigestDay = if (digest.isNotEmpty()) today.toEpochDay() else s.lastDigestDay,
+            )
         }
     }
 

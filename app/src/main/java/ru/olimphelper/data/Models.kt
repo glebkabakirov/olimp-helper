@@ -81,6 +81,7 @@ data class Settings(
     val remind0: Boolean = true,
     val notifyTableChanges: Boolean = true,
     val notifyClaude: Boolean = true,
+    val weeklyDigest: Boolean = true,
     val sheetUrl: String = DEFAULT_SHEET_URL,
     val updatesUrl: String = DEFAULT_UPDATES_URL,
 )
@@ -107,6 +108,8 @@ data class AppState(
     val seenUpdates: Set<String> = emptySet(),
     /** id напоминания → день события (epochDay), чтобы не слать одно и то же дважды. */
     val notified: Map<String, Long> = emptyMap(),
+    /** День (epochDay) последней еженедельной сводки. */
+    val lastDigestDay: Long = 0,
     /** Настройки виджетов на рабочем столе по appWidgetId. */
     val widgets: Map<Int, WidgetConfig> = emptyMap(),
 )

@@ -26,6 +26,28 @@ class RemindersTest {
         assertTrue(again.isEmpty())
     }
 
+    @Test fun longStageEndRemindedThreeDaysAhead() {
+        // онлайн-отбор Бельчонка до 12.01.2027
+        val today = LocalDate.parse("2027-01-09")
+        val model = EventBuilder.build(table, UpdatesFile(), 11, emptySet(), today)
+        assertTrue(Reminders.due(model, emptySet(), Settings(), today, emptyMap())
+            .any { it.event.olympiad == "Бельчонок" && it.event.type == EventType.STAGE_END && it.daysBefore == 3L })
+    }
+
+    @Test fun digestCoversWhatDatesMiss() {
+        val today = LocalDate.parse("2026-10-25")
+        val model = EventBuilder.build(table, UpdatesFile(), 11, emptySet(), today)
+        val d = Reminders.digest(model, emptySet(), emptySet(), today)
+        assertTrue(d.any { "Бельчонок" in it && "срок не указан" in it })
+        // основной тур олимпиады по ИИ прошёл 18.10, финал 16.11, отметки нет
+        assertTrue(d.any { "искусственному" in it && "Прошёл дальше" in it })
+
+        val belKey = model.stages.first { it.row.olympiad == "Бельчонок" && it.row.stage == "Отборочный" }.key
+        val aiKey = model.stages.first { it.row.olympiad.startsWith("Всероссийская олимпиада по иск") && it.row.stage == "Основной" }.key
+        val after = Reminders.digest(model, setOf(belKey), setOf(aiKey), today)
+        assertTrue(after.none { "Бельчонок" in it || "искусственному" in it })
+    }
+
     @Test fun registeredAndConditionalAreSilent() {
         val today = LocalDate.parse("2026-11-03")
         val model = EventBuilder.build(table, UpdatesFile(), 11, emptySet(), today)

@@ -19,12 +19,29 @@ object Reminders {
             .filter { !it.conditional && !it.approx && !Tabs.hidden(it, registered) }
             .mapNotNull { e ->
                 val n = ChronoUnit.DAYS.between(today, e.date)
-                // о конце длинного этапа достаточно сказать накануне
-                val wanted = if (e.type == EventType.STAGE_END) n == 1L && settings.remind1 else n in days
-                if (!wanted) return@mapNotNull null
+                if (n !in days) return@mapNotNull null
                 val id = "${e.id}@$n"
                 if (id in notified) null else Due(id, e, n)
             }
+    }
+
+    /**
+     * Еженедельная сводка о том, что напоминаниями по датам не ловится: открытые регистрации без отметки
+     * (особенно без срока) и финалы, где предыдущий этап уже прошёл, а «Прошёл дальше» не отмечено.
+     */
+    fun digest(model: Model, registered: Set<String>, passed: Set<String>, today: LocalDate): List<String> {
+        val regs = Tabs.openRegistrations(model, registered, passed, today).map { r ->
+            val name = r.stages[0].row.olympiad + " · " + r.stages.joinToString(", ") { it.row.stage }
+            "Регистрация открыта: $name" + (r.deadline?.let { ", до ${it.dayOfMonth}.%02d".format(it.monthValue) } ?: ", срок не указан")
+        }
+        val byKey = model.stages.associateBy { it.key }
+        val finals = model.stages.filter { st ->
+            val prev = st.prevKey?.let(byKey::get) ?: return@filter false
+            !st.isRegRow && st.isFinal && st.prevKey !in passed &&
+                prev.dates.spans.isNotEmpty() && prev.dates.spans.all { it.end < today } &&
+                st.dates.spans.let { sp -> sp.isEmpty() || sp.any { it.end >= today } }
+        }.map { "Прошёл в финал «${it.row.olympiad}»? Отметь «Прошёл дальше», иначе о финале не напомню" }
+        return regs + finals
     }
 
     fun title(d: Due): String {
