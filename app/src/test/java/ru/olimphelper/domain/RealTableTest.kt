@@ -119,6 +119,22 @@ class RealTableTest {
         assertTrue(m.events("Ломоносов").any { it.stageName == "Дополнительный тур" })
     }
 
+    @Test fun newRegistrationRowFromClaudeKeepsTime() {
+        // так Claude записал окно регистрации Innopolis 25.10.2026
+        val u = UpdatesFile(items = listOf(
+            UpdateItem(id = "i", kind = "new_stage", olympiad = "Innopolis Open", stage = "Регистрация на II отборочный",
+                date = "19.10.2026 – 18.11.2026", registration = "ОТКРЫТА",
+                registrationDates = "19.10.2026, 10:00 МСК – 18.11.2026, 12:00 МСК"),
+        ))
+        val m = model(updates = u)
+        val reg = m.stage("Innopolis", "Регистрация на II отборочный")
+        assertTrue(reg.isRegRow)
+        assertEquals(m.stage("Innopolis", "II отборочный").key, reg.targetKey)
+        val close = m.events("Innopolis").single { it.stageName == "II отборочный" && it.type == EventType.REG_CLOSE }
+        assertEquals(LocalDate.parse("2026-11-18"), close.date)
+        assertEquals("12:00", close.time.toString())
+    }
+
     @Test fun diffFindsChangedCell() {
         val changed = table.rows.map { if (it.olympiad == "Ломоносов" && it.stage == "Заключительный") it.copy(dateText = "20.03.2027") else it }
         val d = TableDiff.diff(table.rows, changed, 0)

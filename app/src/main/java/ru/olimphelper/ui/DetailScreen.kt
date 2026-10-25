@@ -50,7 +50,7 @@ fun DetailScreen(u: UiState, name: String, actions: Actions, onBack: () -> Unit)
         },
     ) { pad ->
         if (o == null) {
-            EmptyHint("Этой олимпиады больше нет в таблице")
+            Column(Modifier.padding(pad).padding(horizontal = 16.dp)) { EmptyHint("Этой олимпиады больше нет в таблице") }
             return@Scaffold
         }
         LazyColumn(

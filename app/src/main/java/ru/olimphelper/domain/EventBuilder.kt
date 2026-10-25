@@ -117,7 +117,8 @@ object EventBuilder {
                     isFinal = final,
                     prevKey = prev,
                     dates = if (isReg[i] == true) ParsedDates() else DateParser.parse(r.dateText, season, grade),
-                    reg = if (isReg[i] == true) null else regFor(r, linked[i].orEmpty().map { rows[it] }, ups, season),
+                    reg = if (isReg[i] == true) null
+                    else regFor(r, linked[i].orEmpty().map { rows[it] to applied[it].orEmpty() }, ups, season),
                     dateFromClaude = ups.any { it.date != null },
                 )
             }
@@ -157,9 +158,15 @@ object EventBuilder {
         return candidates.firstOrNull { it > regIdx } ?: candidates.lastOrNull()
     }
 
-    private fun regFor(row: SheetRow, regRows: List<SheetRow>, ups: List<UpdateItem>, season: Int): StageReg {
-        val claudeDates = ups.lastOrNull { it.registrationDates != null }
-        val regRow = regRows.firstOrNull()
+    private fun regFor(
+        row: SheetRow,
+        regRows: List<Pair<SheetRow, List<UpdateItem>>>,
+        ups: List<UpdateItem>,
+        season: Int,
+    ): StageReg {
+        // окно регистрации могло прийти от Claude и для самого этапа, и для строки «Регистрация на …»
+        val claudeDates = (ups + regRows.flatMap { it.second }).lastOrNull { it.registrationDates != null }
+        val regRow = regRows.firstOrNull()?.first
         val statusText = when {
             ups.any { it.registration != null } -> ups.last { it.registration != null }.registration!!
             regRow != null && regRow.regStatus.isNotBlank() -> regRow.regStatus
