@@ -13,6 +13,12 @@
    ```
    В каждой строке: «Олимпиада», «Этап», «Дата этапа», «Примечание / источник», «Ссылка на источник»,
    «Регистрация на этот этап», «Ссылка на регистрацию».
+
+   Если `curl` до docs.google.com не проходит (сеть облачной среды ограничена), возьми актуальные значения
+   ячеек через WebFetch по адресу
+   `https://docs.google.com/spreadsheets/d/16wKSRx8b7BC8YQeT9ulPl3gHKJ7hHWq0/export?format=csv&gid=749938116`,
+   а ссылки на сайты — из снимка `python3 routine/read_table.py app/src/main/assets/table.xlsx`.
+   Сайты олимпиад открывай через WebFetch (и WebSearch, если ссылка устарела).
 2. Прочитай находки прошлого запуска:
    ```bash
    git fetch origin claude/updates && git show origin/claude/updates:data/updates.json
